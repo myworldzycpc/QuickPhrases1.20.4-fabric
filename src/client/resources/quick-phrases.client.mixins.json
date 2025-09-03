@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.myworldzycpc.quick_phrases.mixin.client",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "ExampleClientMixin",
+    "MixinKeyboard"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}

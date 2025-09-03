@@ -1,0 +1,15 @@
+{
+  "quick_phrases.config.insert": "Insert",
+  "quick_phrases.config.add_child": "Add Child",
+  "quick_phrases.config.remove_phrase": "Remove Phrase",
+  "quick_phrases.config.title": "Quick Phrases Config",
+  "quick_phrases.config.confirm": "Confirm",
+  "quick_phrases.config.open_yml": "Open YML File",
+  "quick_phrases.config.reload": "Reload",
+  "quick_phrases.config.reload.tooltip": "Load the Quick Phrases config file from disk. This will overwrite any changes made in-game.",
+  "quick_phrases.phrase_nodes.size": "%s keys",
+  "quick_phrases.current_keys": "Current Keys: %s",
+  "quick_phrases.config.phrases_file.tooltip": "Multiple configuration files have not been implemented yet.",
+  "key.quick_phrases.config": "Phrases Config",
+  "category.quick_phrases": "Quick Phrases"
+}
