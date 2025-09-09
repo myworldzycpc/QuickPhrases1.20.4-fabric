@@ -13,4 +13,4 @@ Placeholders are supported.
 - `{pos}` - Current precise position (x y z)
 - `{pos?block}` - Current block position (x y z)
 - `{block}` - Block id under cursor
-- `{item}` - Item id under cursor
+- `{item}` - Handheld item id
