@@ -136,7 +136,17 @@ public class QuickPhrasesClient implements ClientModInitializer {
                     if (phrases.containsKey(newPath)) {
                         Object value = phrases.get(newPath);
                         if (value instanceof Leaf leaf) {
-                            Util.sendMessage(leaf.getContent());
+                            try {
+                                Util.sendMessage(Util.parseStringWithPlaceholders(leaf.getContent(), client.player));
+                            } catch (IllegalArgumentException e) {
+                                if (client.player != null) {
+                                    client.player.sendMessage(Text.of("IllegalArgumentException: " + e.getMessage()).copy().formatted(Formatting.RED), false);
+                                }
+                            } catch (IllegalStateException e) {
+                                if (client.player != null) {
+                                    client.player.sendMessage(Text.of("IllegalStateException: " + e.getMessage()).copy().formatted(Formatting.RED), false);
+                                }
+                            }
                             currentKeys = new ArrayList<>();
                         } else if (value instanceof PhraseNodes) {
                             currentKeys = newPath;

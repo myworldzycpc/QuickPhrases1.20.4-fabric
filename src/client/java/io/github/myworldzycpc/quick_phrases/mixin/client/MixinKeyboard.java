@@ -12,8 +12,8 @@ public class MixinKeyboard {
 
     @Inject(method = {"onKey"}, cancellable = true, at = {@At("HEAD")})
     private void onKeyboardInput(long windowPointer, int key, int scanCode, int action, int modifiers, CallbackInfo ci) {
-        if (QuickPhrasesClient.onKeyboardInput(key, scanCode, action, modifiers)){
-        ci.cancel();
+        if (QuickPhrasesClient.onKeyboardInput(key, scanCode, action, modifiers)) {
+            ci.cancel();
         }
     }
 
