@@ -61,7 +61,7 @@ public class Util {
         }
     }
 
-    public static String parseStringWithPlaceholders(String input, PlayerEntity player) throws IllegalArgumentException, IllegalStateException {
+    public static String parseStringWithPlaceholders(String input, PlayerEntity player, int depth) throws IllegalArgumentException, IllegalStateException {
         StringBuilder output = new StringBuilder();
         StringBuilder placeholder = new StringBuilder();
         int placeholderDepth = 0;
@@ -84,6 +84,10 @@ public class Util {
                     leftBraceCount++;
                     if (leftBraceCount == 2) {
                         placeholderDepth++;
+                        if (placeholderDepth > 1) {
+                            placeholder.append('{');
+                            placeholder.append('{');
+                        }
                         leftBraceCount = 0;
                     }
                 } else if (c == '}') {
@@ -100,9 +104,13 @@ public class Util {
                     rightBraceCount++;
                     if (rightBraceCount == 2) {
                         placeholderDepth--;
+                        if (placeholderDepth > 0) {
+                            placeholder.append('}');
+                            placeholder.append('}');
+                        }
                         rightBraceCount = 0;
                         if (placeholderDepth == 0) {
-                            output.append(parsePlaceholder(placeholder.toString(), player));
+                            output.append(parsePlaceholder(placeholder.toString(), player, depth));
                             placeholder = new StringBuilder();
                         }
                     }
@@ -173,7 +181,7 @@ public class Util {
         return output.toString();
     }
 
-    public static String parsePlaceholder(String input, PlayerEntity player) {
+    public static String parsePlaceholder(String input, PlayerEntity player, int depth) {
         StringBuilder name = new StringBuilder();
         Map<String, String> args = new HashMap<>();
         boolean isArg = false;
@@ -190,7 +198,7 @@ public class Util {
                 } else if (isArg && c == '&') {
                     isArgValue = false;
                     try {
-                        args.put(argName.toString(), parseStringWithPlaceholders(argValue.toString(), player));
+                        args.put(argName.toString(), parseStringWithPlaceholders(argValue.toString(), player, depth + 1));
                     } catch (IllegalArgumentException e) {
                         throw new IllegalArgumentException("IllegalArgumentException while parsing a string with placeholders \"" + argValue + "\": " + e.getMessage(), e);
                     } catch (IllegalStateException e) {
@@ -226,7 +234,7 @@ public class Util {
         }
         if (!argName.isEmpty()) {
             try {
-                args.put(argName.toString(), parseStringWithPlaceholders(argValue.toString(), player));
+                args.put(argName.toString(), parseStringWithPlaceholders(argValue.toString(), player, depth + 1));
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("IllegalArgumentException while parsing a string with placeholders \"" + argValue + "\": " + e.getMessage(), e);
             } catch (IllegalStateException e) {
@@ -234,7 +242,7 @@ public class Util {
             }
         }
         try {
-            return getPlaceholderValue(name.toString(), player, args);
+            return getPlaceholderValue(name.toString(), player, args, depth);
         } catch (IllegalStateException e) {
             throw new IllegalStateException("IllegalStateException while parsing placeholder {{" + input + "}}: " + e.getMessage(), e);
         } catch (IllegalArgumentException e) {
@@ -242,7 +250,7 @@ public class Util {
         }
     }
 
-    public static String getPlaceholderValue(String name, PlayerEntity player, Map<String, String> args) throws IllegalStateException, IllegalArgumentException {
+    public static String getPlaceholderValue(String name, PlayerEntity player, Map<String, String> args, int depth) throws IllegalStateException, IllegalArgumentException {
         switch (name) {
             case "pos": {
                 Vec3d pos = player.getPos();
@@ -253,7 +261,7 @@ public class Util {
                 }
             }
             case "block": {
-                HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
+                HitResult hitResult = player.raycast(512, 0, false);
                 if (hitResult != null && hitResult.getType() == HitResult.Type.BLOCK) {
                     BlockHitResult blockHitResult = (BlockHitResult) hitResult;
                     BlockPos blockPos = blockHitResult.getBlockPos();
@@ -264,10 +272,23 @@ public class Util {
             }
             case "item": {
                 ItemStack itemStack = player.getMainHandStack();
-                if (itemStack.isEmpty()) {
+                if (itemStack.isEmpty() && !args.containsKey("allowEmpty")) {
                     throw new IllegalStateException("No item found");
                 }
-                return Registries.ITEM.getId(itemStack.getItem()).toString();
+                String itemId = Registries.ITEM.getId(itemStack.getItem()).toString();
+                if (args.containsKey("block")) {
+                    return References.blockItems.getOrDefault(itemId, itemId);
+                } else {
+                    return itemId;
+                }
+            }
+            case "cursor": {
+                String sel = args.getOrDefault("sel", "");
+                if (depth == 0) {
+                    return "[[" + sel + "]]";
+                } else {
+                    return sel;
+                }
             }
         }
         throw new IllegalArgumentException("Invalid placeholder: " + name);

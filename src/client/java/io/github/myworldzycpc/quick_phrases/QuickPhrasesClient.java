@@ -1,10 +1,13 @@
 package io.github.myworldzycpc.quick_phrases;
 
+import io.github.myworldzycpc.quick_phrases.mixin.client.ChatScreenAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -15,12 +18,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class QuickPhrasesClient implements ClientModInitializer {
     public static File phrasesFile;
     public static final File configFile = new File(MinecraftClient.getInstance().runDirectory, "config/quick_phrases/config.yaml");
     public static PhraseNodes phrases;
     private static KeyBinding keyConfig;
+    public static KeyBinding keyPathLock;
+    public static KeyBinding keyChatEdit;
     public static String phrasesDirectory = "phrases";
     public static String defaultPhrasesFile = "default";
     public static List<String> currentKeys = new ArrayList<>();
@@ -48,6 +55,18 @@ public class QuickPhrasesClient implements ClientModInitializer {
                 InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_G, // The keycode of the key
                 "category.quick_phrases" // The translation key of the keybinding's category.
+        ));
+        keyPathLock = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.quick_phrases.path_lock",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_LEFT_ALT,
+                "category.quick_phrases"
+        ));
+        keyChatEdit = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.quick_phrases.chat_edit",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_LEFT_CONTROL,
+                "category.quick_phrases"
         ));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyConfig.wasPressed()) {
@@ -137,7 +156,27 @@ public class QuickPhrasesClient implements ClientModInitializer {
                         Object value = phrases.get(newPath);
                         if (value instanceof Leaf leaf) {
                             try {
-                                Util.sendMessage(Util.parseStringWithPlaceholders(leaf.getContent(), client.player));
+                                String originalMessage = Util.parseStringWithPlaceholders(leaf.getContent(), client.player, 0);
+                                Matcher matcher = Pattern.compile("(.*)\\[\\[(.*)]](.*)").matcher(originalMessage);
+                                String message;
+                                if (matcher.matches()) {
+                                    message = matcher.replaceAll("$1$2$3");
+                                } else {
+                                    message = originalMessage;
+                                }
+                                if (QuickPhrasesClient.keyChatEdit.isPressed()) {
+                                    ChatScreen chatScreen = new ChatScreen(message);
+                                    client.setScreen(chatScreen);
+                                    if (matcher.matches()) {
+                                        int selBegin = matcher.start(2) - 2;
+                                        int selEnd = matcher.end(2) - 2;
+                                        TextFieldWidget chatField = ((ChatScreenAccessor) chatScreen).accessor$chatField();
+                                        chatField.setSelectionStart(selBegin);
+                                        chatField.setSelectionEnd(selEnd);
+                                    }
+                                } else {
+                                    Util.sendMessage(message);
+                                }
                             } catch (IllegalArgumentException e) {
                                 if (client.player != null) {
                                     client.player.sendMessage(Text.of("IllegalArgumentException: " + e.getMessage()).copy().formatted(Formatting.RED), false);
@@ -147,7 +186,9 @@ public class QuickPhrasesClient implements ClientModInitializer {
                                     client.player.sendMessage(Text.of("IllegalStateException: " + e.getMessage()).copy().formatted(Formatting.RED), false);
                                 }
                             }
-                            currentKeys = new ArrayList<>();
+                            if (!QuickPhrasesClient.keyPathLock.isPressed()) {
+                                currentKeys = new ArrayList<>();
+                            }
                         } else if (value instanceof PhraseNodes) {
                             currentKeys = newPath;
                             System.out.println(currentKeys);

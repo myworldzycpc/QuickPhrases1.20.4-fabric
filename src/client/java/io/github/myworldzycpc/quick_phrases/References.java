@@ -3,6 +3,8 @@ package io.github.myworldzycpc.quick_phrases;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import java.util.Map;
+
 public class References {
     public static final BiMap<String, Integer> KEY_CODE_MAP = HashBiMap.create();
 
@@ -123,4 +125,9 @@ public class References {
         KEY_CODE_MAP.put("SCROLL_LOCK", 281);
         KEY_CODE_MAP.put("PRINT_SCREEN", 283);
     }
+
+    public static final BiMap<String, String> blockItems = HashBiMap.create(Map.of(
+            "minecraft:water_bucket", "minecraft:water",
+            "minecraft:lava_bucket", "minecraft:lava"
+    ));
 }

@@ -11,5 +11,7 @@
   "quick_phrases.current_keys": "当前键: %s",
   "quick_phrases.config.phrases_file.tooltip": "多配置文件暂未实现。",
   "key.quick_phrases.config": "短语配置",
-  "category.quick_phrases": "快捷短语"
+  "category.quick_phrases": "快捷短语",
+  "key.quick_phrases.path_lock": "路径锁定修饰键",
+  "key.quick_phrases.chat_edit": "聊天编辑修饰键"
 }

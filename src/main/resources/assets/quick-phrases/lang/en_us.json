@@ -11,5 +11,7 @@
   "quick_phrases.current_keys": "Current Keys: %s",
   "quick_phrases.config.phrases_file.tooltip": "Multiple configuration files have not been implemented yet.",
   "key.quick_phrases.config": "Phrases Config",
-  "category.quick_phrases": "Quick Phrases"
+  "category.quick_phrases": "Quick Phrases",
+  "key.quick_phrases.path_lock": "Path Lock Modifier",
+  "key.quick_phrases.chat_edit": "Chat Edit Modifier"
 }
