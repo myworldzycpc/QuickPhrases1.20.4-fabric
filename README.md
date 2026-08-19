@@ -142,12 +142,12 @@ J: hello world!
 K:
   1: Come on!
   2: Goodbye!
-GREET:
-  morning: Good morning!
-  night: Good night!
-  fight:
-    1: /say Let the battle begin!
-    2: /say Fight!
+G:
+  M: Good morning!
+  N: Good night!
+  F:
+    1: /home
+    2: /back
 ```
 
 You can edit this file directly with any text editor. Use the **Reload** button in the config screen (or restart the game) to apply changes.
@@ -307,12 +307,12 @@ J: 你好！
 K:
   1: 加油！
   2: 再见！
-GREET:
-  morning: 早上好！
-  night: 晚安！
-  fight:
-    1: /say 战斗开始！
-    2: /say 冲啊！
+G:
+  M: 早上好！
+  N: 晚安！
+  F:
+    1: /home
+    2: /back
 ```
 
 你可以用任意文本编辑器直接编辑此文件。编辑完成后，在配置界面点击 **重新加载** 按钮（或重启游戏）即可生效。
