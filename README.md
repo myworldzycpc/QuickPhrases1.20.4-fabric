@@ -163,6 +163,10 @@ Press **`G`** in-game to open the configuration screen:
 - **Right-click menu** — Insert, Add Child, or Remove phrases
 - **Key rebinding** — Click any key button, then press a new key to reassign
 
+### AI Disclosure
+
+The icon and README are AI-generated.
+
 ### License
 
 [MIT License](LICENSE) — Copyright 2025 myworldzycpc
@@ -327,6 +331,10 @@ G:
 - **树形视图** — 以缩进层级浏览和编辑短语
 - **右键菜单** — 插入节点、添加子节点、删除节点
 - **按键重绑定** — 点击任意按键按钮，再按下新按键即可重新分配
+
+### AI 披露
+
+图标和 README 由 AI 生成。
 
 ### 许可证
 
